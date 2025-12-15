@@ -1,0 +1,382 @@
+# AI Resume Analyzer - Complete System
+
+A full-stack AI-powered resume analysis system that extracts information, classifies job roles, and estimates experience levels.
+
+## 📋 Table of Contents
+- [Project Overview](#project-overview)
+- [Architecture](#architecture)
+- [Setup Instructions](#setup-instructions)
+- [API Documentation](#api-documentation)
+- [Frontend Usage](#frontend-usage)
+- [Features](#features)
+- [File Structure](#file-structure)
+
+## 🎯 Project Overview
+
+This system provides:
+- **Resume Parsing**: Extract key information from PDF or text resumes
+- **Information Extraction**: Name, email, phone, skills, education
+- **Experience Calculation**: Automatic calculation of years from date ranges
+- **Job Classification**: ML-based classification into 6 job categories
+- **Experience Level**: Auto-estimate Junior/Mid/Senior levels
+- **Web Interface**: Simple React/Next.js UI for easy usage
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────┐
+│        React/Next.js Frontend           │
+│      (localhost:3000)                   │
+│  - File upload (PDF)                    │
+│  - Text paste input                     │
+│  - Results visualization                │
+└────────────────┬────────────────────────┘
+                 │
+           HTTP Requests
+                 │
+                 ▼
+┌─────────────────────────────────────────┐
+│      FastAPI Backend Server             │
+│      (localhost:8001)                   │
+│  - Resume parsing                       │
+│  - Text extraction from PDF             │
+│  - ML model inference                   │
+│  - Data extraction (regex + NLP)        │
+└────────────────┬──────────────────────┘
+                 │
+        ┌────────┴───────┐
+        ▼                 ▼
+    ML Model       Extraction Utils
+ (classifier)      (utils.py)
+  TF-IDF           - Email/Phone regex
+  Logistic         - Skill detection
+  Regression       - Date parsing
+```
+
+## 🚀 Setup Instructions
+
+### Prerequisites
+- Python 3.8+ (recommended: 3.10+)
+- Node.js 16+ & npm
+- Git
+
+### Backend Setup
+
+```bash
+cd backend
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Train the ML model (one-time)
+python train_model.py
+
+# Start the server
+python server.py
+```
+
+Backend will be available at: `http://127.0.0.1:8001`
+
+### Frontend Setup
+
+```bash
+cd frontend
+
+# Install npm dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+Frontend will be available at: `http://localhost:3000`
+
+## 📡 API Documentation
+
+### Health Check
+```http
+GET /health
+```
+**Response:**
+```json
+{"status": "healthy"}
+```
+
+### Analyze Resume
+```http
+POST /analyze
+Content-Type: multipart/form-data
+
+Parameters:
+- file: PDF file (optional)
+- text: Raw text (optional)
+```
+
+**Request Examples:**
+
+**PDF Upload:**
+```bash
+curl -X POST http://127.0.0.1:8001/analyze \
+  -F "file=@resume.pdf"
+```
+
+**Text Input:**
+```bash
+curl -X POST http://127.0.0.1:8001/analyze \
+  -F "text=John Doe, john@email.com, ..."
+```
+
+**Response:**
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phone": "+1-234-567-8901",
+  "skills": ["Python", "FastAPI", "Docker", "Kubernetes"],
+  "education": ["BS in Computer Science"],
+  "experience_years": 4.5,
+  "experience_level": "Mid",
+  "classification": "FullStack Developer",
+  "confidence": 0.87,
+  "raw_text": "First 500 characters of resume..."
+}
+```
+
+## 🖥️ Frontend Usage
+
+1. Open `http://localhost:3000` in your browser
+2. Choose upload mode:
+   - **PDF Upload**: Drag & drop or click to select PDF file
+   - **Paste Text**: Paste resume text directly
+3. Click **"Analyze Resume"** button
+4. View results:
+   - Extracted candidate information
+   - Detected skills with badges
+   - Job role classification with confidence score
+   - Experience level and years
+   - Education entries
+
+## ✨ Features
+
+### Resume Parsing
+- **PDF Extraction**: Uses PyPDF2 for text extraction
+- **Text Cleaning**: Handles various formatting
+- **Robust Parsing**: Works with different resume formats
+
+### Information Extraction
+- **Name**: Using pattern matching (first few lines)
+- **Email**: Regex-based extraction
+- **Phone**: International format support
+- **Skills**: Comprehensive skill list matching
+- **Education**: Keyword-based detection
+- **Experience**: Date range parsing and calculation
+
+### ML Classification
+- **Algorithm**: Logistic Regression with TF-IDF vectorization
+- **Training Data**: 12 hand-crafted resume samples
+- **Classes**: 
+  - Software Engineer
+  - AI/ML Engineer
+  - Data Scientist
+  - Web Developer
+  - DevOps/Cloud Engineer
+  - FullStack Developer
+
+### Experience Level
+- **Junior**: 0–2 years
+- **Mid**: 2–5 years
+- **Senior**: 5+ years
+
+## 📁 File Structure
+
+```
+project/
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py              # FastAPI application
+│   │   ├── utils.py             # Parsing & extraction utilities
+│   │   └── model.py             # Model loading/saving
+│   ├── models/
+│   │   ├── vectorizer.joblib    # TF-IDF vectorizer
+│   │   └── classifier.joblib    # Trained classifier
+│   ├── train_model.py           # Model training script
+│   ├── server.py                # Server runner
+│   ├── run.py                   # Alternative runner
+│   ├── requirements.txt         # Python dependencies
+│   ├── README.md                # Backend documentation
+│   └── start.bat               # Windows batch starter
+│
+├── frontend/
+│   ├── pages/
+│   │   ├── index.jsx           # Main page
+│   │   └── _app.jsx            # App wrapper
+│   ├── components/
+│   │   ├── ResumeUploader.jsx  # Main component
+│   │   └── ResumeUploader.module.css
+│   ├── styles/
+│   │   └── globals.css
+│   ├── public/
+│   ├── next.config.js
+│   ├── package.json
+│   ├── README.md
+│   └── .gitignore
+│
+└── README.md (this file)
+```
+
+## 🧪 Testing
+
+### Test Backend API Locally
+
+```python
+import requests
+
+# Test with text
+response = requests.post(
+    'http://127.0.0.1:8001/analyze',
+    data={'text': 'John Doe\njohn@email.com\n...'
+)
+print(response.json())
+
+# Test with PDF
+with open('resume.pdf', 'rb') as f:
+    files = {'file': f}
+    response = requests.post(
+        'http://127.0.0.1:8001/analyze',
+        files=files
+    )
+    print(response.json())
+```
+
+## 🎓 ML Model Details
+
+### Training Data Structure
+```python
+[
+    (resume_text, job_category),
+    (resume_text, job_category),
+    ...
+]
+```
+
+### Training Process
+1. Text vectorization using TF-IDF
+2. Logistic Regression classifier training
+3. Model serialization using joblib
+4. ~87% confidence on test samples
+
+### Improving Model Accuracy
+1. Collect more training examples
+2. Add domain-specific keywords to skills list
+3. Use pre-trained embeddings (sentence-transformers)
+4. Fine-tune hyperparameters
+
+## 🔧 Troubleshooting
+
+### Backend Connection Refused
+- Check if backend is running: `http://127.0.0.1:8001/health`
+- Verify port 8001 is not in use
+- Restart backend: `python server.py`
+
+### PDF Extract Empty
+- Ensure PDF is text-based (not scanned image)
+- Try pasting text content instead
+- Check PDF permissions
+
+### Model Not Found
+- Run training: `python train_model.py`
+- Check `backend/models/` directory exists
+- Ensure `.joblib` files are present
+
+### Frontend Not Loading
+- Clear browser cache
+- Check Node.js version: `node --version` (should be 16+)
+- Restart frontend: `npm run dev`
+
+## 📦 Dependencies
+
+### Backend
+- fastapi==0.104.1 - Web framework
+- uvicorn - ASGI server
+- scikit-learn - ML algorithms
+- pandas - Data processing
+- PyPDF2 - PDF parsing
+- python-dateutil - Date parsing
+- pydantic - Data validation
+
+### Frontend
+- react - UI library
+- next.js - React framework
+- axios - HTTP client
+
+## 📝 Example Resumes
+
+### Example 1: Full Stack Developer (4 years)
+Located in `../sample_resume.txt`
+- Expected: FullStack Developer, Mid level
+
+### Example 2: Data Scientist (6+ years)
+```
+Jane Smith
+jane@techcorp.com
+(555) 987-6543
+
+Data Scientist with 7 years in ML/AI
+- TensorFlow, PyTorch, Scikit-learn
+- Neural networks, NLP, Computer vision
+- Python, SQL, AWS
+- Published 5 ML papers
+```
+- Expected: AI/ML Engineer or Data Scientist, Senior level
+
+## 🚀 Deployment
+
+### Local Development
+```bash
+# Terminal 1: Backend
+cd backend && python server.py
+
+# Terminal 2: Frontend  
+cd frontend && npm run dev
+```
+
+### Production Build
+
+**Frontend:**
+```bash
+cd frontend
+npm run build
+npm start
+```
+
+**Backend:**
+```bash
+cd backend
+pip install -r requirements.txt
+python train_model.py
+python server.py
+```
+
+### Docker (Optional)
+Create `Dockerfile` for containerization:
+```dockerfile
+FROM python:3.10-slim
+WORKDIR /app
+COPY backend/ .
+RUN pip install -r requirements.txt
+RUN python train_model.py
+CMD ["python", "server.py"]
+```
+
+## 📄 License
+MIT License - Feel free to use this project
+
+## 👥 Support
+For issues or questions, please refer to individual README files:
+- Backend: `backend/README.md`
+- Frontend: `frontend/README.md`
+
+---
+
+**Built with ❤️ using FastAPI, React, and scikit-learn**
