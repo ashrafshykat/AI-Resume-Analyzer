@@ -26,10 +26,10 @@ This system provides:
 ```
 ┌─────────────────────────────────────────┐
 │        React/Next.js Frontend           │
-│      (localhost:3000)                   │
-│  - File upload (PDF)                    │
-│  - Text paste input                     │
-│  - Results visualization                │
+│          (localhost:3000)               │
+│       - File upload (PDF)               │
+│       - Text paste input                │
+│       - Results visualization           │
 └────────────────┬────────────────────────┘
                  │
            HTTP Requests
@@ -42,7 +42,7 @@ This system provides:
 │  - Text extraction from PDF             │
 │  - ML model inference                   │
 │  - Data extraction (regex + NLP)        │
-└────────────────┬──────────────────────┘
+└────────────────┬────────────────────────┘
                  │
         ┌────────┴───────┐
         ▼                 ▼
@@ -204,7 +204,6 @@ project/
 │   ├── server.py                # Server runner
 │   ├── run.py                   # Alternative runner
 │   ├── requirements.txt         # Python dependencies
-│   ├── README.md                # Backend documentation
 │   └── start.bat               # Windows batch starter
 │
 ├── frontend/
@@ -219,164 +218,7 @@ project/
 │   ├── public/
 │   ├── next.config.js
 │   ├── package.json
-│   ├── README.md
 │   └── .gitignore
 │
 └── README.md (this file)
 ```
-
-## 🧪 Testing
-
-### Test Backend API Locally
-
-```python
-import requests
-
-# Test with text
-response = requests.post(
-    'http://127.0.0.1:8001/analyze',
-    data={'text': 'John Doe\njohn@email.com\n...'
-)
-print(response.json())
-
-# Test with PDF
-with open('resume.pdf', 'rb') as f:
-    files = {'file': f}
-    response = requests.post(
-        'http://127.0.0.1:8001/analyze',
-        files=files
-    )
-    print(response.json())
-```
-
-## 🎓 ML Model Details
-
-### Training Data Structure
-```python
-[
-    (resume_text, job_category),
-    (resume_text, job_category),
-    ...
-]
-```
-
-### Training Process
-1. Text vectorization using TF-IDF
-2. Logistic Regression classifier training
-3. Model serialization using joblib
-4. ~87% confidence on test samples
-
-### Improving Model Accuracy
-1. Collect more training examples
-2. Add domain-specific keywords to skills list
-3. Use pre-trained embeddings (sentence-transformers)
-4. Fine-tune hyperparameters
-
-## 🔧 Troubleshooting
-
-### Backend Connection Refused
-- Check if backend is running: `http://127.0.0.1:8001/health`
-- Verify port 8001 is not in use
-- Restart backend: `python server.py`
-
-### PDF Extract Empty
-- Ensure PDF is text-based (not scanned image)
-- Try pasting text content instead
-- Check PDF permissions
-
-### Model Not Found
-- Run training: `python train_model.py`
-- Check `backend/models/` directory exists
-- Ensure `.joblib` files are present
-
-### Frontend Not Loading
-- Clear browser cache
-- Check Node.js version: `node --version` (should be 16+)
-- Restart frontend: `npm run dev`
-
-## 📦 Dependencies
-
-### Backend
-- fastapi==0.104.1 - Web framework
-- uvicorn - ASGI server
-- scikit-learn - ML algorithms
-- pandas - Data processing
-- PyPDF2 - PDF parsing
-- python-dateutil - Date parsing
-- pydantic - Data validation
-
-### Frontend
-- react - UI library
-- next.js - React framework
-- axios - HTTP client
-
-## 📝 Example Resumes
-
-### Example 1: Full Stack Developer (4 years)
-Located in `../sample_resume.txt`
-- Expected: FullStack Developer, Mid level
-
-### Example 2: Data Scientist (6+ years)
-```
-Jane Smith
-jane@techcorp.com
-(555) 987-6543
-
-Data Scientist with 7 years in ML/AI
-- TensorFlow, PyTorch, Scikit-learn
-- Neural networks, NLP, Computer vision
-- Python, SQL, AWS
-- Published 5 ML papers
-```
-- Expected: AI/ML Engineer or Data Scientist, Senior level
-
-## 🚀 Deployment
-
-### Local Development
-```bash
-# Terminal 1: Backend
-cd backend && python server.py
-
-# Terminal 2: Frontend  
-cd frontend && npm run dev
-```
-
-### Production Build
-
-**Frontend:**
-```bash
-cd frontend
-npm run build
-npm start
-```
-
-**Backend:**
-```bash
-cd backend
-pip install -r requirements.txt
-python train_model.py
-python server.py
-```
-
-### Docker (Optional)
-Create `Dockerfile` for containerization:
-```dockerfile
-FROM python:3.10-slim
-WORKDIR /app
-COPY backend/ .
-RUN pip install -r requirements.txt
-RUN python train_model.py
-CMD ["python", "server.py"]
-```
-
-## 📄 License
-MIT License - Feel free to use this project
-
-## 👥 Support
-For issues or questions, please refer to individual README files:
-- Backend: `backend/README.md`
-- Frontend: `frontend/README.md`
-
----
-
-**Built with ❤️ using FastAPI, React, and scikit-learn**
